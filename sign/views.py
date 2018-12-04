@@ -90,28 +90,41 @@ def sign_index_action(request, eid):
     event = get_object_or_404(Event, id=eid)
     phone = request.POST.get("phone", "")
     sign_count = len(Guest.objects.filter(sign=1, event_id=eid))  # 已签到人数
-    if sign_count == guest_count:
-        return render(request, "sign_index.html", {"event": event, "finish": "签到完成！！！",
-                                                   "sign_count": sign_count, "guest_count": guest_count})
     result = Guest.objects.filter(phone=phone)  # 因为有可能一个人参加两场发布会，所以用filter
     if not result:
         sign_count = len(Guest.objects.filter(sign=1, event_id=eid))  # 保证返回的签到数是实时的，因为也许其他用户已经签到了
+        if sign_count == guest_count and guest_count != 0:            # 如果签到数和嘉宾数是相等的，返回签到完成，因为也许其他用户已签到，该用户只是进错了发布会
+            return render(request, "sign_index.html", {"event": event, "finish": "签到完成！！！",
+                                                       "hint": "手机号不存在!", "sign_count": sign_count,
+                                                       "guest_count": guest_count})
         return render(request, "sign_index.html", {"event": event, "hint": "手机号不存在!",
                                                    "sign_count": sign_count, "guest_count": guest_count})
     result = Guest.objects.filter(event_id=eid, phone=phone)  # 这里可以用get，因为手机号和发布会是唯一的
     if not result:
         sign_count = len(Guest.objects.filter(sign=1, event_id=eid))  # 保证返回的签到数是实时的，因为也许其他用户已经签到了
+        if sign_count == guest_count and guest_count != 0:            # 如果签到数和嘉宾数是相等的，返回签到完成，因为也许其他用户已签到，该用户只是进错了发布会
+            return render(request, "sign_index.html", {"event": event, "finish": "签到完成！！！",
+                                                       "hint": "手机号和发布会不匹配!", "sign_count": sign_count,
+                                                       "guest_count": guest_count})
         return render(request, "sign_index.html", {"event": event, "hint": "手机号和发布会不匹配!",
                                                    "sign_count": sign_count, "guest_count": guest_count})
     result = Guest.objects.get(phone=phone, event_id=eid)   # get返回一个对象
     if result.sign:
         sign_count = len(Guest.objects.filter(sign=1, event_id=eid))  # 保证返回的签到数是实时的，因为也许其他用户已经签到了
+        if sign_count == guest_count and guest_count != 0:            # 如果签到数和嘉宾数是相等的，返回签到完成，因为也许其他用户已签到，该用户只是进错了发布会
+            return render(request, "sign_index.html", {"event": event, "finish": "签到完成！！！",
+                                                       "hint": "该手机号已签到!", "guest": result, "sign_count": sign_count,
+                                                       "guest_count": guest_count})
         return render(request, "sign_index.html", {"event": event, "hint": "该手机号已签到!", "guest": result,
                                                    "sign_count": sign_count, "guest_count": guest_count})
     else:
         Guest.objects.filter(phone=phone, event_id=eid).update(sign=1)
         sign_count = len(Guest.objects.filter(sign=1, event_id=eid))  # 保证返回的签到数是实时的，
-        # 因为签到成功时，签到数要加1，写在前边的话，签到数返回的数据少1
+        # 因为签到成功时，签到数要加1，写在前边的话，bug：签到数返回的数据少1
+        if sign_count == guest_count and guest_count != 0:            # 如果签到数和嘉宾数是相等的，返回签到完成，因为也许其他用户已签到，该用户只是进错了发布会
+            return render(request, "sign_index.html", {"event": event, "finish": "签到完成！！！",
+                                                       "hint": "签到成功!", "guest": result, "sign_count": sign_count,
+                                                       "guest_count": guest_count})
         return render(request, "sign_index.html", {"event": event, "hint": "签到成功!", "guest": result,
                                                    "sign_count": sign_count, "guest_count": guest_count})
 
