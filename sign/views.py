@@ -94,7 +94,7 @@ def sign_index_action(request, eid):
     if not result:
         sign_count = len(Guest.objects.filter(sign=1, event_id=eid))  # 保证返回的签到数是实时的，因为也许其他用户已经签到了
         if sign_count == guest_count and guest_count != 0:            # 如果签到数和嘉宾数是相等的，返回签到完成，因为也许其他用户已签到，
-                                                                      # 该用户只是进错了发布会，，或者最后一位嘉宾点击签到后，也应显示签到完成
+                                                                       # 该用户只是进错了发布会，，或者最后一位嘉宾点击签到后，也应显示签到完成
             return render(request, "sign_index.html", {"event": event, "finish": "签到完成！！！",
                                                        "hint": "手机号不存在!", "sign_count": sign_count,
                                                        "guest_count": guest_count})
