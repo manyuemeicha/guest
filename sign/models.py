@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 # 发布会表
 class Event(models.Model):
-    # 自动生成自增长的id字段
+    # 自动生成自增长的id字段   即id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)   # 发布会名称
     limit = models.IntegerField()     # 参加人数
     status = models.BooleanField()   # 状态
@@ -19,7 +19,7 @@ class Event(models.Model):
 
 # 嘉宾表
 class Guest(models.Model):
-    # 自动生成自增长的id字段
+    # 自动生成自增长的id字段   即id = models.AutoField(primary_key=True)
     event = models.ForeignKey(Event)            # 外键  关联发布会id
     realname = models.CharField(max_length=64)      # 姓名
     phone = models.CharField(max_length=16)     # 手机号
